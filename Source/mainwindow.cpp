@@ -9,27 +9,63 @@
 #include <qinputdialog.h>
 #include <QApplication>
 #include "calculate.h"
+#include <QDebug>
 #include <QDialog>
 #include <QTimer>
 #include <QTextStream>
 #include <QMessageBox>
+#include <QMediaPlayer>
 #include <QFile>
+#include <QUrl>
+#include <QEvent>
+#include <QFileDialog>
+#include <QMimeData>
+#include <QPainter>
+#include <QImage>
+#include <QDragEnterEvent>
 #include "fraction.h"
 #include "const.h"
 using namespace _Action;
 using namespace std;
 
-
+extern QMediaPlayer *player;
 bool shiftdown=false;
 bool poweron=false;
+bool CanbeConvert=true;
+bool isPlayingMusic=true;
 extern bool isActive;
-double ans=0;
+Frac ans=0;
 int prec=8;
-double memory=0;
+Frac memory=0;
 stringstream *buffer;
 QTimer *timer;
 bool initgraph=true;
 extern QString Vd;
+bool expanded=false;
+QString imageName=QString("BACK.jpg");
+bool MainWindow::eventFilter(QObject *target, QEvent *event)
+{
+     if (target==this)
+     {
+         if (event->type() == QEvent::DragEnter)
+         {
+             QDragEnterEvent *keyEvent = static_cast<QDragEnterEvent *>(event);
+             keyEvent->acceptProposedAction();
+             QList<QUrl> *filename=new QList<QUrl>(keyEvent->mimeData()->urls());
+             if (filename->empty()==false)
+             {
+                 imageName=filename->first().toLocalFile();
+                 repaint();
+             }
+         }
+     }
+     return QMainWindow::eventFilter(target, event);
+}
+void MainWindow::paintEvent(QPaintEvent *event)
+{
+    QPainter painter(this);
+    painter.drawPixmap(rect(), QPixmap(imageName));
+}
 
 void MainWindow::setshift()
 {
@@ -54,7 +90,7 @@ void MainWindow::init(bool input)
     if (initgraph)
     {
         ui->groupBox->setStyleSheet("border:none");
-        this->setWindowTitle("CASIO FX-575MS (WINDOWS XP 64-BIT) VERSION 5.0");
+        this->setWindowTitle("CASIO FX-575MS (WINDOWS Vista) VERSION Atom");
         buffer=new stringstream("");
         timer=new QTimer();
         timer->setInterval(1000);
@@ -62,10 +98,6 @@ void MainWindow::init(bool input)
         initgraph=false;
         QFile input("DataV.dat");
         QString read;
-        if(!input.open(QIODevice::ReadOnly | QIODevice::Text))
-        {
-            cout << "Open failed." << endl;
-        }
         QTextStream txtInput(&input);
         read=txtInput.readLine();
         if (read==Vd)
@@ -76,13 +108,15 @@ void MainWindow::init(bool input)
     poweron=input;
     ans=0;
     ui->InputScreen->setText("");
-    ui->ResultScreen->setText("0");
+    ui->ResultScreen->display("0");
     ui->InputScreen->setVisible(input);
     ui->ResultScreen->setVisible(input);
+    ui->StateScreen->setVisible(input);
     ui->ShiftOn->setVisible(shiftdown);
     ui->AcAdapter->setVisible(isActive);
     ui->Active->setVisible(!isActive);
     ui->Charge->setVisible(!isActive);
+    ui->StateScreen->setText("Answer");
     prec=ui->Precision->value();
     if (isActive)
     {
@@ -110,7 +144,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->ResultScreen->setAlignment(Qt::AlignRight);
+    setAcceptDrops(true);
+    installEventFilter(this);
     init(false);
 }
 
@@ -222,7 +257,9 @@ void MainWindow::on_Ac_clicked()
     if (shiftdown)
         init(false);
     else
+    {
         ui->InputScreen->setText("");
+    }
     setshift();
 }
 
@@ -267,6 +304,7 @@ void MainWindow::on_RightSign_clicked()
 
 void MainWindow::on_GetAnswer_clicked()
 {
+    CanbeConvert=true;
     string p=(ui->InputScreen->text()).toStdString();
     p="0+"+p;
     delete buffer;
@@ -275,21 +313,24 @@ void MainWindow::on_GetAnswer_clicked()
     try
     {
         ans=limit();
-        sprintf(t,"%.*g",prec,ans);
-        QString qs(t);
-        ui->ResultScreen->setText(qs);
+        if (_isnan(double(ans)))
+            throw Math_Error();
+        ui->StateScreen->setText("Answer");
+        sprintf(t,"%.*g",prec,double(ans));
+        ui->ResultScreen->display(t);
     }
     catch(Syntax_Error)
     {
-        ui->ResultScreen->setText("Syntax_Error");
+        ui->StateScreen->setText("Syn_Err");
+        ui->ResultScreen->display(0);
     }
     catch(Math_Error)
     {
-        ui->ResultScreen->setText("Math_Error");
+        ui->StateScreen->setText("Mth_Err");
+        ui->ResultScreen->display(0);
     }
     setshift();
 }
-
 
 
 void MainWindow::on_Const_clicked()
@@ -297,18 +338,19 @@ void MainWindow::on_Const_clicked()
 
     if (ui->ResultScreen->isVisible())
     {
-        QString q=QInputDialog::getText(NULL,QString("InputConstOrder"),QString("1-20"));
+        QString q=QInputDialog::getText(NULL,QString("InputConstOrder"),QString("1-40"));
         short t=q.toShort();
-        if (t>0 && t<=20)
+        if (t>0 && t<=40)
         {
             QString a=tr(name[t-1].c_str());
-            char b[1000];
+            ui->StateScreen->setText(a);
+            char b[100];
             sprintf(b,"%.*g",prec,value[t-1]);
-            a=a+QString("=")+QString(b);
-            ui->ResultScreen->setText(a);
+            ans=value[t-1];
+            ui->ResultScreen->display(b);
         }
         else
-            ui->ResultScreen->setText("Stack_Error");
+            ui->StateScreen->setText("Stk_Err");
     }
     setshift();
 }
@@ -394,7 +436,7 @@ void MainWindow::on_Charge_clicked()
 
 void MainWindow::on_About_clicked()
 {
-    char *lab="Powered By Windows 5.1\n\nVersion 5.0\n\n1992-2004, All Rights Reserved.";
+    char *lab="Powered By Windows 5.1\n\nVersion ATOM\n\n1992-2004, All Rights Reserved.";
     QMessageBox::information(NULL,"About",lab,0);
 }
 
@@ -504,7 +546,6 @@ void MainWindow::on_E_pi_clicked()
 
 void MainWindow::on_TimeFormat_clicked()
 {
-
     int hh,mm;
     double ss;
     get_timeformat(hh,mm,ss);
@@ -512,28 +553,32 @@ void MainWindow::on_TimeFormat_clicked()
     stringstream streamout;
     if (ans<0)
         streamout<<"-";
-    streamout<<hh<<" H "<<mm<<" M "<<ss<<" S ";
+    streamout<<hh<<" ' "<<mm<<" ' "<<ss<<" ' ";
     getline(streamout,output);
-    ui->ResultScreen->setText(QString::fromStdString(output));
+    ui->ResultScreen->display(QString::fromStdString(output));
     setshift();
 }
 
 void MainWindow::on_Fraction_clicked()
 {
-    Frac resultfrac(ans);
-    if(shiftdown)
+    if (CanbeConvert)
     {
-        resultfrac.set_out_statue(false);
+        Frac resultfrac(ans);
+        resultfrac.YF();
+        if(shiftdown)
+        {
+            resultfrac.set_out_statue(false);
+        }
+        else
+        {
+            resultfrac.set_out_statue(true);
+        }
+        string output;
+        stringstream streamout;
+        streamout<<resultfrac;
+        getline(streamout,output);
+        ui->ResultScreen->display(QString::fromStdString(output));
     }
-    else
-    {
-        resultfrac.set_out_statue(true);
-    }
-    string output;
-    stringstream streamout;
-    streamout<<resultfrac;
-    getline(streamout,output);
-    ui->ResultScreen->setText(QString::fromStdString(output));
     setshift();
 }
 
@@ -601,4 +646,55 @@ void MainWindow::on_Rand_clicked()
         ui->InputScreen->setText(ui->InputScreen->text()+"Rnd(");
     }
     setshift();
+}
+
+void MainWindow::on_More_clicked()
+{
+    if (expanded==false)
+    {
+        expanded=true;
+        this->resize(631,671);
+        ui->More->setStyleSheet("background-image: url(:/new/prefix1/up.ico);");
+    }
+    else
+    {
+        expanded=false;
+        this->resize(631,452);
+        ui->More->setStyleSheet("background-image: url(:/new/prefix1/down.ico);");
+    }
+}
+
+void MainWindow::on_StopMedia_clicked()
+{
+    if (isPlayingMusic)
+    {
+        isPlayingMusic=false;
+        ui->StopMedia->setText("StartMusic");
+        player->stop();
+    }
+    else
+    {
+        isPlayingMusic=true;
+        ui->StopMedia->setText("StopMusic");
+        player->play();
+    }
+}
+
+void MainWindow::doplay()
+{
+    if (isPlayingMusic==false)
+    {
+        player->stop();
+    }
+    else
+    {
+        player->play();
+    }
+}
+
+void MainWindow::on_ChangeMedia_clicked()
+{
+    QString MusicName=QFileDialog::getOpenFileName(this,NULL,NULL,"*.mp3 *.wav *.ogg");
+    if (!MusicName.isEmpty())
+        player->setMedia(QUrl::fromLocalFile(MusicName));
 }

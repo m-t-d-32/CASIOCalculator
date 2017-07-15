@@ -11,10 +11,10 @@ using namespace _Action;
 #define const_pi 3.14159265358979
 #define const_e 2.718281828459045
 #define eps 1e-6
-
+extern bool CanbeConvert;
 extern stringstream *buffer;
-extern double ans;
-extern double memory;
+extern Frac ans;
+extern Frac memory;
 char temp[100];
 void read(int times)
 {
@@ -46,9 +46,9 @@ bool isValue(int read,bool &neg)
     }
     return false;
 }
-double getVL()
+Frac getVL()
 {
-    double value1;
+    Frac value1;
     bool neg;
     if (isValue(buffer->peek(),neg))
     {
@@ -65,7 +65,6 @@ double getVL()
     }
     else if (buffer->peek()=='S')
     {
-       QMessageBox::information(NULL,"Please wait","It may take a long time.");
         value1=inte();
     }
     else if (buffer->peek()=='d')
@@ -130,18 +129,18 @@ double getVL()
     }
     if (buffer->peek()=='!')
     {
-        value1=Jc(value1);
+        value1=Jc((double)value1);
         read(1);
     }
-    if (fabs(value1)>1e100)
+    if (fabs((double)value1)>1e100)
     {
         throw(Math_Error());
     }
     return value1;
 }
-double limit()
+Frac limit()
 {
-    double value1=getVL();
+    Frac value1=getVL();
     while (true)
     {
         char m=buffer->peek();
@@ -188,16 +187,16 @@ double limit()
                     break;
                 }
         }
-        if (fabs(value1)>1e100)
+        if (fabs((double)value1)>1e100)
         {
             throw(Math_Error());
         }
     }
 }
-double Plus(double value)
+Frac Plus(Frac value)
 {
     read(1);
-    double value1=getVL();
+    Frac value1=getVL();
     char m=buffer->peek();
     switch(m)
     {
@@ -238,10 +237,10 @@ double Plus(double value)
             }
     }
 }
-double Minus(double value)
+Frac Minus(Frac value)
 {
     read(1);
-    double value1=getVL();
+    Frac value1=getVL();
     char m=buffer->peek();
     switch(m)
     {
@@ -282,10 +281,10 @@ double Minus(double value)
             }
     }
 }
-double Multi(double value)
+Frac Multi(Frac value)
 {
     read(1);
-    double value1=getVL();
+    Frac value1=getVL();
     char m=buffer->peek();
     switch(m)
     {
@@ -316,92 +315,93 @@ double Multi(double value)
             }
     }
 }
-double Div(double value)
+Frac Div(Frac value)
 {
     read(1);
-    double value1=getVL();
+    Frac value1=getVL();
     char m=buffer->peek();
     switch(m)
     {
         case 'x':
             {
-                if (!value1) throw Math_Error();
+                if (fabs((double)value1)<eps) throw Math_Error();
                 return Multi(value/value1);
                 break;
             }
         case '/':
             {
-                if (fabs(value1)<eps) throw Math_Error();
+                if (fabs((double)value1)<eps) throw Math_Error();
                 return Div(value/value1);
                 break;
             }
         case '^':
             {
                 value1=Pow(value1);
-                if (fabs(value1)<eps) throw Math_Error();
+                if (fabs((double)value1)<eps) throw Math_Error();
                 return value/value1;
                 break;
             }
         case 'X':
             {
-                value1=value/XSqr(value1);
-                if (fabs(value1)<eps) throw Math_Error();
+                value1=XSqr(value1);
+                if (fabs((double)value1)<eps) throw Math_Error();
                 return value/value1;
                 break;
             }
         default:
             {
+                if (fabs((double)value1)<eps) throw Math_Error();
                 return value/value1;
                 break;
             }
     }
 }
-double Pow(double value)
+Frac Pow(Frac value)
 {
     read(1);
-    double value1=getVL();
+    Frac value1=getVL();
     char m=buffer->peek();
     switch(m)
     {
         case '^':
             {
                 value1=Multi(value1);
-                if (!value && !value1) throw Math_Error();
+                if (fabs((double)value1)<eps && fabs(double(value))<eps) throw Math_Error();
                 return pow(value,value1);
                 break;
             }
         case 'X':
             {
                 value1=XSqr(value1);
-                if (!value && !value1) throw Math_Error();
+                if (fabs((double)value1)<eps && fabs(double(value))<eps) throw Math_Error();
                 return pow(value,value1);
                 break;
             }
         default:
             {
-                if (!value && !value1) throw Math_Error();
+                if (fabs((double)value1)<eps && fabs(double(value))<eps) throw Math_Error();
                 return pow(value,value1);
                 break;
             }
     }
 }
-double XSqr(double value)
+Frac XSqr(Frac value)
 {
     read(4);
-    double value1=getVL();
+    Frac value1=getVL();
     char m=buffer->peek();
     switch (m)
     {
         case 'X':
             {
-                if (fabs(value)<eps) throw Math_Error();
+                if (fabs((double)value)<eps) throw Math_Error();
                 value1=XSqr(value1);
-                return pow(value1,1/value);
+                return pow(value1,inv(value));
                 break;
             }
         default:
             {
-                return pow(value1,1/value);
+                return pow(value1,inv(value));
                 break;
             }
     }
@@ -410,6 +410,7 @@ double inte()
 {
     double min,max;
     read(2);
+    CanbeConvert=false;
     string backup;
     getline(*buffer,backup);
     buffer->clear();
@@ -423,11 +424,11 @@ double inte()
         }
     }
     buffer->get();
-    min=limit();
+    min=(double)limit();
     if (buffer->peek()==',')
     {
         buffer->get();
-        max=limit();
+        max=(double)limit();
     }
     else
     {
@@ -469,7 +470,7 @@ double funclnte(string rap,double it)
     backup=buffer->str();
     buffer->clear();
     buffer->str(rap);
-    double result=limit();
+    double result=(double)limit();
     buffer->clear();
     buffer->str(backup);
     return result;
@@ -496,6 +497,7 @@ double vite()
 {
     double s;
     read(5);
+    CanbeConvert=false;
     string backup;
     getline(*buffer,backup);
     buffer->clear();
@@ -509,7 +511,7 @@ double vite()
         }
     }
     buffer->get();
-    s=limit();
+    s=(double)limit();
     string lasttime;
     getline(*buffer,lasttime);
     buffer->clear();
@@ -531,21 +533,24 @@ double RealVite(double s)
 double Sin()
 {
     read(4);
-    double temp=limit();
+    CanbeConvert=false;
+    double temp=(double)limit();
     read(1);
     return sin(temp);
 }
 double Cos()
 {
     read(4);
-    double temp=limit();
+    CanbeConvert=false;
+    double temp=(double)limit();
     read(1);
     return cos(temp);
 }
 double Tan()
 {
     read(4);
-    double temp=limit();
+    CanbeConvert=false;
+    double temp=(double)limit();
     if (fabs((temp-const_pi/2)/const_pi-(int)((temp-const_pi/2)/const_pi))<eps)
         throw Math_Error();
     read(1);
@@ -554,6 +559,7 @@ double Tan()
 double Arc()
 {
     read(3);
+    CanbeConvert=false;
     char m=buffer->peek();
     switch(m)
     {
@@ -574,7 +580,8 @@ double Arc()
 double ArcSin()
 {
     read(4);
-    double temp=limit();
+    CanbeConvert=false;
+    double temp=(double)limit();
     if (temp>1 || temp<-1)
         throw Math_Error();
     read(1);
@@ -583,7 +590,8 @@ double ArcSin()
 double ArcCos()
 {
     read(4);
-    double temp=limit();
+    CanbeConvert=false;
+    double temp=(double)limit();
     if (temp>1 || temp<-1)
         throw Math_Error();
     read(1);
@@ -592,14 +600,16 @@ double ArcCos()
 double ArcTan()
 {
     read(4);
-    double temp=limit();
+    CanbeConvert=false;
+    double temp=(double)limit();
     read(1);
     return atan(temp);
 }
 double Log()
 {
     read(4);
-    double temp=limit();
+    CanbeConvert=false;
+    double temp=(double)limit();
     if (temp<=0)
         throw Math_Error();
     read(1);
@@ -608,7 +618,8 @@ double Log()
 double In()
 {
     read(3);
-    double temp=limit();
+    CanbeConvert=false;
+    double temp=(double)limit();
     if (temp<=0)
         throw Math_Error();
     read(1);
@@ -617,15 +628,16 @@ double In()
 double Rand()
 {
     read(3);
+    CanbeConvert=false;
     char m=buffer->peek();
     if (m=='(')
     {
         buffer->get();
-        double min=limit();
+        double min=(double)limit();
         if (buffer->peek()!=',')
             throw Syntax_Error();
         buffer->get();
-        double max=limit();
+        double max=(double)limit();
         double result=min+rand()%32767*(max-min)/32767.0;
         read(1);
         return result;
@@ -655,18 +667,20 @@ double Jc(double c)
 }
 void get_timeformat(int & h,int & m,double & s)
 {
-    double bk=fabs(ans);
+    double bk=fabs((double)ans);
     h=(int)bk;
     bk-=h;
     bk*=60;
+    if (fabs(bk-(int)bk)*60<0.01) bk=(int)bk;
     m=(int)bk;
     bk-=m;
     bk*=60;
+    bk=(int)(bk*100)/100.0;
     s=bk;
 }
 bool judge_m()
 {
-    if (abs(memory)>eps)
+    if (abs((double)memory)>eps)
     {
         return true;
     }

@@ -1,14 +1,9 @@
 #include "fraction.h"
-
+#include <cmath>
+#include <iostream>
+using namespace std;
 namespace _Action
 {
-	void swap(int &a, int &b)
-	{
-		int temp = a;
-		a = b;
-		b = temp;
-	}
-
 	int get_maxY(int a, int b)
 	{
 		if (a && b)
@@ -26,28 +21,48 @@ namespace _Action
 
 	std::ostream & operator <<(std::ostream & out, Frac & f)
 	{
-        if (f.out_statue)
+        Frac temp=f;
+        if (temp.out_statue)
         {
             int zf=0;
-            bool z=(f.num>0);
-            f.deno=fabs(f.deno);
-            while (f.num>=f.deno)
+            bool z=(temp.num>0);
+            temp.deno=fabs(temp.deno);
+            while (temp.num>=temp.deno)
             {
-                f.num-=f.deno;
+                temp.num-=temp.deno;
                 zf++;
             }
             if (!z) out<<"-";
-            if (zf) out<<zf<<" & ";
+            if (zf) out<<zf<<"   ";
         }
-		if (f.num)
-            out << f.num << "/" << f.deno;
+        if (temp.num)
+            out << temp.num << ":" << temp.deno;
 		else
 			out << 0;
 		return out;
 	}
 
+    std::istream & operator >>(std::istream & in, Frac & f)
+    {
+        f.deno=1;
+        in>>f.num;
+        //cout<<f<<endl;
+        return in;
+    }
+
 	void Frac::YF()
 	{
+        if (num)
+        {
+            int max = num > deno ? num : deno;
+            int temp = mecro / max;
+            num *=temp;
+            deno *=temp;
+        }
+        else
+        {
+            return;
+        }
 		int temp = get_maxY(num, deno);
 		if (temp)
 		{
@@ -55,6 +70,17 @@ namespace _Action
 			num /= temp;
 		}
 	}
+
+    Frac pow(Frac a, Frac b)
+    {
+        return Frac(::pow(a.num,(double)b),::pow(a.deno,(double)b));
+    }
+    Frac inv(const Frac & a)
+    {
+        if (a.num==0) throw FracDenoZero();
+        return Frac(a.deno,a.num);
+    }
+
     void Frac::set_out_statue(bool t)
     {
         out_statue=t;
@@ -63,19 +89,16 @@ namespace _Action
     Frac::Frac(double a, double b):out_statue(true)
 	{
         if (!b) throw FracDenoZero();
-		if (a)
-		{
-			int max = a > b ? a : b;
-			int temp = mecro / max;
-			num = a*temp;
-			deno = b*temp;
-			YF();
-		}
-		else
-		{
-			num = 0;
-			deno = 1;
-		}
+        if (num)
+        {
+            num=a;
+            deno=b;
+        }
+        else
+        {
+            num=0;
+            deno=1;
+        }
 	}
 
 	void Frac::setvalue(double a, double b)
@@ -83,16 +106,8 @@ namespace _Action
         if (!b) throw FracDenoZero();
 		if (a)
 		{
-			int max = a > b ? a : b;
-			int temp = mecro / max;
-			num = a*temp;
-			deno = b*temp;
-			YF();
-		}
-		else
-		{
-			num = 0;
-			deno = 1;
+            num=a;
+            deno=b;
 		}
 	}
 
@@ -151,6 +166,18 @@ namespace _Action
 		return Frac(num*read.deno, deno*read.num);
 	}
 
+    Frac Frac::operator +=(const Frac & read)
+    {
+        (*this)=(*this)+read;
+        return *this;
+    }
+
+    Frac Frac::operator -=(const Frac & read)
+    {
+        (*this)=(*this)-read;
+        return *this;
+    }
+
 	Frac Frac::operator ++()
 	{
 		num += deno;
@@ -191,7 +218,7 @@ namespace _Action
 		return *this;
 	}
 
-	Frac::operator double() const
+    Frac::operator double() const
 	{
 		return ((double)num) / ((double)deno);
 	}

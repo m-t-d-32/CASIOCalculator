@@ -2,7 +2,8 @@
     <qresource prefix="/new/prefix1">
         <file>icon.ico</file>
         <file>icon2.ico</file>
-        <file>back1.JPG</file>
-        <file>back.jpg</file>
+        <file>down.ico</file>
+        <file>up.ico</file>
+        <file>Start.JPG</file>
     </qresource>
 </RCC>

@@ -2,20 +2,22 @@
 #define CALCULATE
 #include <iostream>
 #include <string>
+#include "fraction.h"
 using namespace std;
 struct Syntax_Error{};
 struct Math_Error{};
+struct Stack_Error{};
 void read(int);
 bool isChar(int);
 bool isValue(int, bool &);
-double limit();
-double Plus(double);
-double Minus(double);
-double Multi(double);
-double Div(double);
-double Pow(double);
-double XSqr(double);
-double getVL();
+_Action::Frac limit();
+_Action::Frac Plus(_Action::Frac);
+_Action::Frac Minus(_Action::Frac);
+_Action::Frac Multi(_Action::Frac);
+_Action::Frac Div(_Action::Frac);
+_Action::Frac Pow(_Action::Frac);
+_Action::Frac XSqr(_Action::Frac);
+_Action::Frac getVL();
 double Rand();
 double inte();
 double RealInte(double,double);

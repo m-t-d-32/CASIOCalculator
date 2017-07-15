@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>350</width>
-    <height>218</height>
+    <width>865</width>
+    <height>486</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,26 +18,29 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>350</width>
-    <height>218</height>
+    <width>865</width>
+    <height>486</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>350</width>
-    <height>218</height>
+    <width>865</width>
+    <height>486</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-image: url(:/new/prefix1/Start.JPG);</string>
   </property>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>350</width>
-     <height>218</height>
+     <width>865</width>
+     <height>486</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -48,26 +51,24 @@
    </property>
    <property name="minimumSize">
     <size>
-     <width>350</width>
-     <height>218</height>
+     <width>865</width>
+     <height>486</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
-     <width>350</width>
-     <height>218</height>
+     <width>865</width>
+     <height>486</height>
     </size>
    </property>
    <property name="text">
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="ccc.qrc">:/new/prefix1/back.jpg</pixmap>
+    <pixmap>:/new/prefix1/back.jpg</pixmap>
    </property>
   </widget>
  </widget>
- <resources>
-  <include location="ccc.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

@@ -19,7 +19,6 @@ private slots:
 
     void setshift();
     void init(bool);
-
     void minus1s();
 
     void on_Number0_clicked();
@@ -110,9 +109,18 @@ private slots:
 
     void on_Rand_clicked();
 
+    void on_More_clicked();
+
+    void on_StopMedia_clicked();
+
+    bool eventFilter(QObject *, QEvent *);
+    void on_ChangeMedia_clicked();
+
+protected:
+    void paintEvent(QPaintEvent *event);
 public slots:
     void on_Active_clicked();
-
+    void doplay();
 private:
     Ui::MainWindow *ui;  
     Dialog dialog;
