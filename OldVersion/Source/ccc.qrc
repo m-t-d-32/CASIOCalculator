@@ -1,8 +1,0 @@
-<RCC>
-    <qresource prefix="/new/prefix1">
-        <file>icon.ico</file>
-        <file>icon2.ico</file>
-        <file>back1.JPG</file>
-        <file>back.jpg</file>
-    </qresource>
-</RCC>
