@@ -72,6 +72,8 @@ namespace _Action
             tp_Num*=10;
             tp_Deno*=10;
         }
+        tp_Num=round(tp_Num);
+        tp_Deno=round(tp_Deno);
         __int64 temp = get_maxY(tp_Num, tp_Deno);
 		if (temp)
 		{
