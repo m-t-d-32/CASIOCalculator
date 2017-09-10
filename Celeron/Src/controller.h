@@ -228,6 +228,10 @@ private slots:
 
     void on_SolveHelp_clicked();
 
+    void on_Log_clicked();
+
+    void on_Ln_clicked();
+
 private:
     Ui::Controller *ui;
     int prec;

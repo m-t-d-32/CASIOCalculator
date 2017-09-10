@@ -54,8 +54,13 @@ void Controller::init()
     }
     now=geometry();
     player=new QMediaPlayer(0);
-    player->setMedia(QUrl::fromLocalFile("BackMusic.mp3"));
-    player->play();
+    QFile file("BackMusic.mp3");
+    if (file.exists())
+    {
+            player->setMedia(QUrl::fromLocalFile("BackMusic.mp3"));
+            player->play();
+    }
+
     connect(player,SIGNAL(stateChanged(QMediaPlayer::State)),player,SLOT(play()));
     prec=8;
     ui->InputScreen->setText("");
@@ -795,8 +800,8 @@ void Controller::on_DoSolve_clicked()
         stringstream temp(m);
         buffer=&temp;
         bool syerr=false;
-        double x=0;
-        double y;
+        double x=1;
+        double y=0;
         for (int i=0;i<1e6;i++)
         {
             try
@@ -812,7 +817,7 @@ void Controller::on_DoSolve_clicked()
             }
             catch (...)
             {
-
+                x++;
             }
         }
         if (syerr==true)
@@ -1069,3 +1074,13 @@ void Controller::on_DelSV_clicked()
 }
 
 
+
+void Controller::on_Log_clicked()
+{
+    ui->InputScreen->insert("log(");
+}
+
+void Controller::on_Ln_clicked()
+{
+    ui->InputScreen->insert("In(");
+}
