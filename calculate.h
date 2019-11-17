@@ -1,4 +1,4 @@
-#ifndef CALCULATE
+﻿#ifndef CALCULATE
 #define CALCULATE
 #include <iostream>
 #include <string>
@@ -35,6 +35,10 @@ double Arc();
 double Log();
 double In();
 double Jc(double);
+
+double r_d(double);
+double d_r(double);
+
 bool judge_m();
 void get_timeformat(int &,int &,double &);
 void Replace(string &,double);

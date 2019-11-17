@@ -1,11 +1,11 @@
-#include <iostream>
+﻿#include <iostream>
 #include <math.h>
 #ifndef __Action14__Frac
 #define __Action14__Frac
 
 namespace _Action
 {
-#define mecro 1e9
+#define mecro 1e10
 	void Error(int);
 	class Frac
 	{
@@ -15,8 +15,8 @@ namespace _Action
             bool out_statue;
 		public:
             void YF();
-            Frac(double a=0,double b=1);
-			void setvalue(double,double b=1);
+            Frac(double a=0,double b=1,bool t=true);
+            void setvalue(double,double b=1);
             void set_out_statue(bool);
 			Frac operator+ (const Frac &) const;
 			Frac operator- (const Frac &) const;
@@ -35,7 +35,6 @@ namespace _Action
 			Frac operator++ ();
 			Frac operator-- (int);
 			Frac operator-- ();
-            Frac convert(int) const;
 			const Frac &operator= (const Frac &);
             explicit operator double() const;
             friend Frac inv(const Frac &);
@@ -43,7 +42,7 @@ namespace _Action
             friend std::istream & operator >>(std::istream &,Frac &);
             friend Frac pow(Frac ,Frac );
 	};
-	int get_maxY(int,int);
+	__int64 get_maxY(__int64, __int64);
 
     template<class T>
     void swap(T &a,T &b)

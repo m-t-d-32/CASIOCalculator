@@ -1,11 +1,14 @@
-#include "fraction.h"
+﻿#include "fraction.h"
 #include <cmath>
 #include <iostream>
+
 using namespace std;
 namespace _Action
 {
-	int get_maxY(int a, int b)
+	__int64 get_maxY(__int64 a, __int64 b)
 	{
+        a=abs(a);
+        b=abs(b);
 		if (a && b)
 		{
 			if (a<b) swap(a, b);
@@ -21,54 +24,67 @@ namespace _Action
 
 	std::ostream & operator <<(std::ostream & out, Frac & f)
 	{
-        Frac temp=f;
-        if (temp.out_statue)
+        f.YF();
+        __int64 num=f.num,deno=f.deno;
+        if (num%deno==0)
         {
-            int zf=0;
-            bool z=(temp.num>0);
-            temp.deno=fabs(temp.deno);
-            while (temp.num>=temp.deno)
-            {
-                temp.num-=temp.deno;
-                zf++;
-            }
-            if (!z) out<<"-";
-            if (zf) out<<zf<<"   ";
+            out<<num/deno;
         }
-        if (temp.num)
-            out << temp.num << ":" << temp.deno;
-		else
-			out << 0;
-		return out;
+        else if (num/deno==0)
+        {
+            out<<num<<" : "<<deno;
+        }
+        else
+        {
+            if (f.out_statue)
+            {
+                if (num<0)
+                {
+                    out<<"-";
+                    num=-num;
+                }
+                out<<num/deno<<" & "<<num%deno<<":"<<deno;
+            }
+            else
+            {
+                out<<num<<" : "<<deno;
+            }
+        }
+        return out;
 	}
 
     std::istream & operator >>(std::istream & in, Frac & f)
     {
         f.deno=1;
         in>>f.num;
-        //cout<<f<<endl;
         return in;
     }
 
 	void Frac::YF()
 	{
-        if (num)
-        {
-            int max = num > deno ? num : deno;
-            int temp = mecro / max;
-            num *=temp;
-            deno *=temp;
-        }
-        else
+        double tp_Num=num,tp_Deno=deno;
+		if (!tp_Num)
         {
             return;
         }
-		int temp = get_maxY(num, deno);
+        while (tp_Num<1e9 && tp_Deno<1e9)
+        {
+            tp_Num*=10;
+            tp_Deno*=10;
+        }
+        tp_Num=round(tp_Num);
+        tp_Deno=round(tp_Deno);
+        __int64 temp = get_maxY(tp_Num, tp_Deno);
 		if (temp)
 		{
-			deno /= temp;
-			num /= temp;
+			deno = tp_Deno / temp;
+			num = tp_Num / temp;
 		}
+        if (deno<0)
+        {
+            num=-num;
+            deno=-deno;
+        }
 	}
 
     Frac pow(Frac a, Frac b)
@@ -86,7 +102,7 @@ namespace _Action
         out_statue=t;
     }
 
-    Frac::Frac(double a, double b):out_statue(true)
+    Frac::Frac(double a, double b, bool t):out_statue(t)
 	{
         if (!b) throw FracDenoZero();
         if (num)
@@ -98,10 +114,10 @@ namespace _Action
         {
             num=0;
             deno=1;
-        }
+        }        
 	}
 
-	void Frac::setvalue(double a, double b)
+    void Frac::setvalue(double a, double b)
 	{
         if (!b) throw FracDenoZero();
 		if (a)
@@ -113,7 +129,7 @@ namespace _Action
 
 	Frac Frac::operator-() const
 	{
-		return Frac(-num, deno);
+        return Frac(-num, deno);
 	}
 
 	bool Frac::operator==(const Frac & read) const
@@ -124,13 +140,13 @@ namespace _Action
 
 	bool Frac::operator>(const Frac & read) const
 	{
-		if ((double)(*this)>(double)read) return true;
+        if ((double)(*this)>(double)read) return true;
 		return false;
 	}
 
 	bool Frac::operator<(const Frac & read) const
 	{
-		if ((double)(*this)<(double)read) return true;
+        if ((double)(*this)<(double)read) return true;
 		return false;
 	}
 
@@ -169,6 +185,7 @@ namespace _Action
     Frac Frac::operator +=(const Frac & read)
     {
         (*this)=(*this)+read;
+        YF();
         return *this;
     }
 
@@ -193,6 +210,7 @@ namespace _Action
 	Frac Frac::operator --()
 	{
 		num -= deno;
+        YF();
 		return *this;
 	}
 
@@ -200,15 +218,6 @@ namespace _Action
 	{
 		num -= deno;
 		return Frac(num + deno, deno);
-	}
-
-	Frac Frac::convert(int read) const
-	{
-		int temp = get_maxY(deno, read);
-		Frac tpf;
-		tpf.deno = deno*read / temp;
-		tpf.num = num*read / temp;
-		return tpf;
 	}
 
 	const Frac &Frac::operator =(const Frac & read)
@@ -220,6 +229,7 @@ namespace _Action
 
     Frac::operator double() const
 	{
-		return ((double)num) / ((double)deno);
+        return ((double)num) / ((double)deno);
 	}
+
 }

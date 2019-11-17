@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2017-06-26T07:39:26
+# Project created by QtCreator 2017-08-09T10:19:11
 #
 #-------------------------------------------------
 
@@ -8,32 +8,25 @@ QT       += core gui multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = Cal
+TARGET = CASIO7
 TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
-    active.cpp \
+        controller.cpp \
     calculate.cpp \
-    dialog.cpp \
     fraction.cpp \
-    start.cpp
+    baseconv.cpp
 
-HEADERS  += mainwindow.h \
-    active.h \
+HEADERS  += controller.h \
     calculate.h \
-    dialog.h \
     fraction.h \
     const.h \
-    start.h
+    baseconv.h
 
-FORMS    += mainwindow.ui \
-    dialog.ui \
-    start.ui
+FORMS    += controller.ui
 
-DISTFILES +=
-RC_FILE += CCC.rc
-CONFIG +=C++11
 RESOURCES += \
-    ccc.qrc
+    backgrounds.qrc
+
+RC_ICONS =ICON.ico

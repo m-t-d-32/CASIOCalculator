@@ -1,4 +1,4 @@
-#include <sstream>
+﻿#include <sstream>
 #include <iostream>
 #include <cmath>
 #include <QDebug>
@@ -16,6 +16,10 @@ extern stringstream *buffer;
 extern Frac ans;
 extern Frac memory;
 char temp[100];
+enum exp_value{Rad,Deg};
+extern int express;
+
+
 void read(int times)
 {
     for (int i=0;i<times;i++)
@@ -410,7 +414,7 @@ double inte()
 {
     double min,max;
     read(2);
-    CanbeConvert=false;
+
     string backup;
     getline(*buffer,backup);
     buffer->clear();
@@ -497,7 +501,6 @@ double vite()
 {
     double s;
     read(5);
-    CanbeConvert=false;
     string backup;
     getline(*buffer,backup);
     buffer->clear();
@@ -528,38 +531,57 @@ double RealVite(double s)
     getline(*buffer,rap,',');
     buffer->clear();
     buffer->str(rap);
-    return ((funclnte(rap,s+eps)-funclnte(rap,s))/eps);
+    double t1=funclnte(rap,s+eps),t2=funclnte(rap,s);
+    return ((t1-t2)/eps);
 }
 double Sin()
 {
     read(4);
-    CanbeConvert=false;
     double temp=(double)limit();
     read(1);
-    return sin(temp);
+    if (express==Deg)
+    {
+        return sin(d_r(temp));
+    }
+    else
+    {
+        return sin(temp);
+    }
 }
 double Cos()
 {
     read(4);
-    CanbeConvert=false;
     double temp=(double)limit();
     read(1);
-    return cos(temp);
+    if (express==Deg)
+    {
+        return cos(d_r(temp));
+    }
+    else
+    {
+        return cos(temp);
+    }
 }
 double Tan()
 {
     read(4);
-    CanbeConvert=false;
     double temp=(double)limit();
     if (fabs((temp-const_pi/2)/const_pi-(int)((temp-const_pi/2)/const_pi))<eps)
         throw Math_Error();
     read(1);
-    return tan(temp);
+    if (express==Deg)
+    {
+        return tan(d_r(temp));
+    }
+    else
+    {
+        return tan(temp);
+    }
 }
 double Arc()
 {
     read(3);
-    CanbeConvert=false;
+
     char m=buffer->peek();
     switch(m)
     {
@@ -580,35 +602,53 @@ double Arc()
 double ArcSin()
 {
     read(4);
-    CanbeConvert=false;
     double temp=(double)limit();
     if (temp>1 || temp<-1)
         throw Math_Error();
     read(1);
-    return asin(temp);
+    if (express==Deg)
+    {
+        return r_d(asin(temp));
+    }
+    else
+    {
+        return asin(temp);
+    }
 }
 double ArcCos()
 {
     read(4);
-    CanbeConvert=false;
+
     double temp=(double)limit();
     if (temp>1 || temp<-1)
         throw Math_Error();
     read(1);
-    return acos(temp);
+    if (express==Deg)
+    {
+        return r_d(acos(temp));
+    }
+    else
+    {
+        return acos(temp);
+    }
 }
 double ArcTan()
 {
     read(4);
-    CanbeConvert=false;
     double temp=(double)limit();
     read(1);
-    return atan(temp);
+    if (express==Deg)
+    {
+        return r_d(atan(temp));
+    }
+    else
+    {
+        return atan(temp);
+    }
 }
 double Log()
 {
     read(4);
-    CanbeConvert=false;
     double temp=(double)limit();
     if (temp<=0)
         throw Math_Error();
@@ -618,7 +658,7 @@ double Log()
 double In()
 {
     read(3);
-    CanbeConvert=false;
+
     double temp=(double)limit();
     if (temp<=0)
         throw Math_Error();
@@ -628,7 +668,6 @@ double In()
 double Rand()
 {
     read(3);
-    CanbeConvert=false;
     char m=buffer->peek();
     if (m=='(')
     {
@@ -678,6 +717,7 @@ void get_timeformat(int & h,int & m,double & s)
     bk=(int)(bk*100)/100.0;
     s=bk;
 }
+
 bool judge_m()
 {
     if (abs((double)memory)>eps)
@@ -685,4 +725,14 @@ bool judge_m()
         return true;
     }
     return false;
+}
+
+double d_r(double t)
+{
+    return t/180*const_pi;
+}
+
+double r_d(double t)
+{
+    return t*180/const_pi;
 }
