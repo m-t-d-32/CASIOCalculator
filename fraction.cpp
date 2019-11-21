@@ -105,7 +105,7 @@ namespace _Action
     Frac::Frac(double a, double b, bool t):out_statue(t)
 	{
         if (!b) throw FracDenoZero();
-        if (num)
+        if (a)
         {
             num=a;
             deno=b;
