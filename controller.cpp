@@ -146,7 +146,7 @@ bool judge_if_number(QString t)
     string m=t.toStdString();
     if (m.size()==0)
         return false;
-    for (int i=0;i<m.size();i++)
+    for (size_t i=0;i<m.size();i++)
     {
         if (m[i]<'0' || m[i]>'9')
         {

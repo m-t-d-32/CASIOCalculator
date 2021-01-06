@@ -1,7 +1,7 @@
 ﻿#include "baseconv.h"
 bool judgeifnum(char t)
 {
-    if (t>='0' && t<='9' || t>='A' && t<='Z')
+    if ((t>='0' && t<='9') || (t>='A' && t<='Z'))
     {
         return true;
     }

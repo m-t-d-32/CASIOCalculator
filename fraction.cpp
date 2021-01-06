@@ -119,7 +119,10 @@ namespace _Action
 
     void Frac::setvalue(double a, double b)
 	{
-        if (!b) throw FracDenoZero();
+        if (!b)
+        {
+            throw FracDenoZero();
+        }
 		if (a)
 		{
             num=a;

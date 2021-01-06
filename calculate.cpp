@@ -29,14 +29,14 @@ void read(int times)
 }
 bool isChar(int read)
 {
-    if (read>=65 && read<=90 || read>=97 && read<=122)
+    if ((read>=65 && read<=90) || (read>=97 && read<=122))
         return true;
     return false;
 }
 bool isValue(int read,bool &neg)
 {
     neg=false;
-    if (read>=48 && read<58 || read=='.') return true;
+    if ((read>=48 && read<58) || read=='.') return true;
     else if(read=='-' || read=='+')
     {
         while (read=='-' || read=='+')
@@ -484,7 +484,7 @@ void Replace(string &p,double t)
     string sum;
     char temp[100];
     sprintf(temp,"%lf",t);
-    for (int i=0;i<p.size();i++)
+    for (size_t i=0;i<p.size();i++)
     {
         if (p[i]!='U')
         {
@@ -598,6 +598,7 @@ double Arc()
                 break;
              }
     }
+    return 0;
 }
 double ArcSin()
 {

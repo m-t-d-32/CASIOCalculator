@@ -3,6 +3,8 @@
 #ifndef __Action14__Frac
 #define __Action14__Frac
 
+#define __int64 long long //For __int64 not defined
+
 namespace _Action
 {
 #define mecro 1e10
